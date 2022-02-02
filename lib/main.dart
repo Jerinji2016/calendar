@@ -25,8 +25,47 @@ class BaseWidget extends StatelessWidget {
         centerTitle: true,
         backgroundColor: const Color(0xFFAA2020),
       ),
-      body: const Center(
-        child: CalendarWidget(),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.125,
+              child: Center(
+                child: InkWell(
+                  onTap: () {},
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 10.0,
+                      horizontal: 15.0,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
+                        Radius.circular(10.0),
+                      ),
+                      border: Border.all(
+                        color: const Color(0xFF29434e),
+                        width: 2,
+                      ),
+                      color: const Color(0xFF263238),
+                    ),
+                    child: const Text(
+                      "Show Dialog",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const Expanded(
+              child: CalendarWidget(),
+            ),
+          ],
+        ),
       ),
     );
   }
