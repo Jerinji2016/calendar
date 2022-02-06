@@ -7,6 +7,7 @@ ValueNotifier<int> weekStart = ValueNotifier(DateTime.monday);
 void main() {
   runApp(
     const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: BaseWidget(),
       themeMode: ThemeMode.dark,
     ),
@@ -116,9 +117,7 @@ class _BaseWidgetState extends State<BaseWidget> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10.0),
                           Expanded(
-                            flex: 1,
                             child: Center(
                               child: Material(
                                 color: const Color(0xFF263238),
@@ -160,7 +159,7 @@ class _BaseWidgetState extends State<BaseWidget> {
                   ),
                 ),
                 Expanded(
-                  flex: 2,
+                  flex: isPortrait ? 3 : 2,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
