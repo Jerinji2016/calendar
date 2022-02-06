@@ -122,7 +122,8 @@ class _BaseWidgetState extends State<BaseWidget> {
   }
 
   void _showCalendarDialog(BuildContext context) async {
-    Calendar.showDatePickerDialog(context, DateTime.now());
+    DateTime? date = await Calendar.showDatePickerDialog(context, DateTime.now());
+    debugPrint('_BaseWidgetState._showCalendarDialog: pickedDate: $date');
   }
 }
 

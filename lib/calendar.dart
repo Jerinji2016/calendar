@@ -26,23 +26,21 @@ class Calendar {
     }
   }
 
-  static void showDatePickerDialog(BuildContext context, DateTime initialDateTime) async {
-    await showDialog(
-      context: context,
-      barrierColor: Colors.black45,
-      barrierDismissible: true,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 5.0,
-          sigmaY: 5.0,
+  static Future<DateTime?> showDatePickerDialog(BuildContext context, DateTime initialDateTime) async => await showDialog<DateTime?>(
+        context: context,
+        barrierColor: Colors.black45,
+        barrierDismissible: true,
+        builder: (context) => BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: 5.0,
+            sigmaY: 5.0,
+          ),
+          child: _CalendarPickerWidget(
+            initialDateTime: initialDateTime,
+            selectedDateTime: DateTime.now(),
+          ),
         ),
-        child: _CalendarPickerWidget(
-          initialDateTime: initialDateTime,
-          selectedDateTime: DateTime.now(),
-        ),
-      ),
-    );
-  }
+      );
 }
 
 class CalendarWidget extends StatelessWidget {
@@ -77,6 +75,7 @@ class _Calendar extends StatefulWidget {
   final void Function(DateTime pickedDate)? onDatePicked;
 
   final DateTime? selectedDateTime;
+  final DateTime? disableDateBefore;
 
   final double? width;
 
@@ -86,6 +85,7 @@ class _Calendar extends StatefulWidget {
     required this.year,
     this.width,
     this.selectedDateTime,
+    this.disableDateBefore,
     this.onMonthChanged,
     this.onDatePicked,
     this.showMonthInHeader = false,
@@ -106,6 +106,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
     keepPage: true,
   );
   final DateTime dateTime = DateTime(2021, 10, 2);
+  late DateTime? _selectedDateTime;
 
   //  caches height value on changing page
   double _newHeight = 300;
@@ -119,6 +120,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
+    _selectedDateTime = widget.selectedDateTime;
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 200)).then(
         (_) => _onPageChanged(_monthPageController.page!.toInt(), false),
@@ -182,9 +184,16 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
                         physics: const NeverScrollableScrollPhysics(),
                         child: _CalendarMonth(
                           dateTime: dateDelegate,
-                          selectedDateTime: widget.selectedDateTime,
+                          selectedDateTime: _selectedDateTime,
                           width: calendarWidth,
-                          onDatePicked: widget.onDatePicked,
+                          onDatePicked: widget.onDatePicked != null
+                              ? (date) {
+                                  _selectedDateTime = date;
+                                  widget.onDatePicked?.call(date);
+                                  setState(() {});
+                                }
+                              : null,
+                          disableDateBefore: widget.disableDateBefore,
                           postBuildCallback: (Size widgetSize) {
                             if (_newHeight != widgetSize.height) _newHeight = widgetSize.height;
                           },
@@ -293,22 +302,25 @@ class _CalendarMonth extends StatelessWidget {
 
   final DateTime dateTime;
   final DateTime? selectedDateTime;
+  final DateTime? disableDateBefore;
+
   final double width;
+  final int weekStart = DateTime.monday;
+
   final Function(Size widgetSize)? postBuildCallback;
   final Function(DateTime datePicked)? onDatePicked;
 
-  final int weekStart = DateTime.monday;
-
   final List<String> _weekHeaders = [];
   final List<int> _weekIndex = [];
-  late final int _firstDayOffset;
 
+  late final int _firstDayOffset;
   late final int noOfDaysInMonth;
 
   _CalendarMonth({
     Key? key,
     required this.dateTime,
     this.selectedDateTime,
+    this.disableDateBefore,
     required this.width,
     this.postBuildCallback,
     this.onDatePicked,
@@ -331,8 +343,6 @@ class _CalendarMonth extends StatelessWidget {
 
     DateTime firstDayOfMonth = dateTime.firstDayOfMonth;
     _firstDayOffset = _weekIndex.indexWhere((element) => element == firstDayOfMonth.weekday);
-
-    debugPrint('_CalendarMonth._CalendarMonth: $selectedDateTime');
   }
 
   @override
@@ -396,8 +406,9 @@ class _CalendarMonth extends StatelessWidget {
                       int date = index - _firstDayOffset + 1;
                       bool isValid = date > 0 && date <= noOfDaysInMonth;
 
-                      bool isSelected =
-                          selectedDateTime != null && (DateTime(dateTime.year, dateTime.month, date).compareTo(selectedDateTime!.absolute) == 0);
+                      DateTime thisDay = DateTime(dateTime.year, dateTime.month, date);
+                      bool isSelected = selectedDateTime != null && (thisDay.compareTo(selectedDateTime!.absolute) == 0);
+                      bool isDisabled = disableDateBefore != null && thisDay.compareTo(disableDateBefore!.absolute) < 0;
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -413,16 +424,23 @@ class _CalendarMonth extends StatelessWidget {
                                           shape: const ContinuousRectangleBorder(
                                             borderRadius: BorderRadius.all(Radius.circular(20)),
                                           ),
-                                          child: SizedBox(
-                                            height: 22,
-                                            width: 22,
-                                            child: Center(
-                                              child: Text(
-                                                date.toString(),
-                                                textAlign: TextAlign.center,
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            customBorder: const ContinuousRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                            ),
+                                            onTap: isDisabled ? null : () => onDatePicked?.call(thisDay),
+                                            child: SizedBox(
+                                              height: 22,
+                                              width: 22,
+                                              child: Center(
+                                                child: Text(
+                                                  date.toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: isDisabled ? Colors.grey : Colors.white,
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
                                               ),
                                             ),
@@ -451,11 +469,13 @@ class _CalendarMonth extends StatelessWidget {
 class _CalendarPickerWidget extends StatefulWidget {
   final DateTime initialDateTime;
   final DateTime selectedDateTime;
+  final DateTime? disableDatesBefore;
 
   const _CalendarPickerWidget({
     Key? key,
     required this.initialDateTime,
     required this.selectedDateTime,
+    this.disableDatesBefore,
   }) : super(key: key);
 
   @override
@@ -473,7 +493,6 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
     super.initState();
 
     _dateTime = ValueNotifier(widget.initialDateTime);
-    // _selectedDate = widget.selectedDateTime;
   }
 
   @override
@@ -571,6 +590,7 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                             key: _calendarKey,
                             width: width,
                             month: DateTime.february,
+                            disableDateBefore: DateTime(2021, 09, 22),
                             year: 2022,
                             showMonthInHeader: true,
                             showMonthActionButtons: true,
