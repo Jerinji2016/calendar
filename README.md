@@ -10,4 +10,14 @@ App that has Calendar Widget
 
 ##  Screenshots
 
-_Coming soon..._
+### _Portrait_
+
+Mainscreen | Week start drop-down | DatePicker dialog
+:--------------------:|:----------------:|:-----------------------:
+![p_ss_1](screenshots/p_normal.png) | ![p_ss_2](screenshots/p_dropdown.png) | ![p_ss_3](screenshots/p_dialog.png)  
+
+### _Landscape_
+
+Mainscreen | Week start drop-down | DatePicker dialog
+:--------------------:|:----------------:|:-----------------------:
+![l_ss_1](screenshots/l_normal.png) | ![l_ss_2](screenshots/l_dropdown.png) | ![l_ss_3](screenshots/l_dialog.png)  
