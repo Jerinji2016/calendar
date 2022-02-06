@@ -86,6 +86,6 @@ class BaseWidget extends StatelessWidget {
   }
 
   void _showCalendarDialog(BuildContext context) async {
-    Calendar.showDatePickerDialog(context);
+    Calendar.showDatePickerDialog(context, DateTime.now());
   }
 }
