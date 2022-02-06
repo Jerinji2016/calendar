@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:calendar/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,24 +29,39 @@ class Calendar {
   static void showDatePickerDialog(BuildContext context, DateTime initialDateTime) async {
     await showDialog(
       context: context,
-      barrierColor: const Color(0xFF131934),
+      barrierColor: Colors.black45,
       barrierDismissible: true,
-      builder: (context) => _CalendarPickerWidget(
-        initialDateTime: initialDateTime,
-        selectedDateTime: DateTime.now(),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 5.0,
+          sigmaY: 5.0,
+        ),
+        child: _CalendarPickerWidget(
+          initialDateTime: initialDateTime,
+          selectedDateTime: DateTime.now(),
+        ),
       ),
     );
   }
 }
 
 class CalendarWidget extends StatelessWidget {
-  const CalendarWidget({Key? key}) : super(key: key);
+  final DateTime? selectedDateTime;
+  final void Function(int pageIndex, DateTime dateTime)? onMonthChanged;
+
+  const CalendarWidget({
+    Key? key,
+    this.selectedDateTime,
+    this.onMonthChanged,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const _Calendar(
+    return _Calendar(
       month: DateTime.february,
       year: 2022,
+      selectedDateTime: selectedDateTime,
+      onMonthChanged: onMonthChanged,
     );
   }
 }
@@ -52,9 +69,14 @@ class CalendarWidget extends StatelessWidget {
 class _Calendar extends StatefulWidget {
   final int month;
   final int year;
-  final void Function(int index, DateTime date)? onMonthChanged;
+
   final bool showMonthActionButtons;
   final bool showMonthInHeader;
+
+  final void Function(int index, DateTime date)? onMonthChanged;
+  final void Function(DateTime pickedDate)? onDatePicked;
+
+  final DateTime? selectedDateTime;
 
   final double? width;
 
@@ -63,7 +85,9 @@ class _Calendar extends StatefulWidget {
     required this.month,
     required this.year,
     this.width,
+    this.selectedDateTime,
     this.onMonthChanged,
+    this.onDatePicked,
     this.showMonthInHeader = false,
     this.showMonthActionButtons = false,
   }) : super(key: key);
@@ -75,7 +99,7 @@ class _Calendar extends StatefulWidget {
 class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
   static const int infinitePageOffset = 999;
   static const double _widgetControllerHeight = 45.0;
-  static const int nextMonth = 1, prevMonth = -1;
+  static const int _nextMonth = 1, _prevMonth = -1;
 
   late final PageController _monthPageController = PageController(
     initialPage: infinitePageOffset,
@@ -89,20 +113,16 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
   //  actual height to which the container will adjust.. derived from [_newHeight]
   double _dynamicCalendarHeight = 301;
 
-  late ValueNotifier<String> titleTime;
-
   void refreshWidget() => (mounted) ? _onPageChanged(_monthPageController.page!.toInt(), false) : null;
 
   @override
   void initState() {
     super.initState();
-    titleTime = ValueNotifier(DateFormat("MMMM d, EEEE yyyy").format(dateTime));
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 200)).then((_) {
-        debugPrint('_CalendarState.initState: ');
-        _onPageChanged(_monthPageController.page!.toInt(), false);
-      });
+      Future.delayed(const Duration(milliseconds: 200)).then(
+        (_) => _onPageChanged(_monthPageController.page!.toInt(), false),
+      );
     });
   }
 
@@ -133,6 +153,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
             itemBuilder: (context, index) {
               // debugPrint('_CalendarState.build: $pageIndex');
               DateTime dateDelegate = _getDateTimeFromIndex(index);
+              DateFormat headerMonthFormat = DateFormat(dateDelegate.year == DateTime.now().year ? "MMMM" : "MMMM y");
 
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -142,7 +163,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
                       height: _widgetControllerHeight,
                       child: Center(
                         child: Text(
-                          DateFormat("MMMM").format(dateDelegate),
+                          headerMonthFormat.format(dateDelegate),
                           style: const TextStyle(
                             fontSize: 14.0,
                             color: Colors.white,
@@ -161,9 +182,10 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
                         physics: const NeverScrollableScrollPhysics(),
                         child: _CalendarMonth(
                           dateTime: dateDelegate,
+                          selectedDateTime: widget.selectedDateTime,
                           width: calendarWidth,
+                          onDatePicked: widget.onDatePicked,
                           postBuildCallback: (Size widgetSize) {
-                            // debugPrint('_CalendarState.build: post call: $_newHeight == ${widgetSize.height}');
                             if (_newHeight != widgetSize.height) _newHeight = widgetSize.height;
                           },
                         ),
@@ -196,7 +218,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () => _onMonthChanged(prevMonth),
+                            onTap: () => _onMonthChanged(_prevMonth),
                             highlightColor: Colors.transparent,
                             borderRadius: const BorderRadius.all(
                               Radius.circular(22.5),
@@ -220,7 +242,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
                       child: Center(
                         child: InkWell(
                           highlightColor: Colors.transparent,
-                          onTap: () => _onMonthChanged(nextMonth),
+                          onTap: () => _onMonthChanged(_nextMonth),
                           borderRadius: const BorderRadius.all(
                             Radius.circular(22.5),
                           ),
@@ -244,7 +266,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
     );
   }
 
-  void _onPageChanged(int index, [bool notify = false]) {
+  void _onPageChanged(int index, [bool notify = true]) {
     DateTime date = _getDateTimeFromIndex(index);
     if (notify) widget.onMonthChanged?.call(index - infinitePageOffset, date);
 
@@ -254,7 +276,7 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
     }
   }
 
-  void _onMonthChanged(int action) => (action == nextMonth)
+  void _onMonthChanged(int action) => (action == _nextMonth)
       ? _monthPageController.nextPage(
           duration: const Duration(milliseconds: 300),
           curve: Curves.ease,
@@ -270,50 +292,57 @@ class _CalendarMonth extends StatelessWidget {
   static const int weekIterator = 7;
 
   final DateTime dateTime;
+  final DateTime? selectedDateTime;
   final double width;
   final Function(Size widgetSize)? postBuildCallback;
+  final Function(DateTime datePicked)? onDatePicked;
 
   final int weekStart = DateTime.monday;
 
-  final List<String> weekHeaders = [];
-  final List<int> weekIndex = [];
-  late final int firstDayOffset;
+  final List<String> _weekHeaders = [];
+  final List<int> _weekIndex = [];
+  late final int _firstDayOffset;
 
   late final int noOfDaysInMonth;
 
   _CalendarMonth({
     Key? key,
     required this.dateTime,
+    this.selectedDateTime,
     required this.width,
     this.postBuildCallback,
+    this.onDatePicked,
   }) : super(key: key) {
     switch (weekStart) {
       case DateTime.monday:
-        weekHeaders.addAll(["M", "T", "W", "T", "F", "S", "S"]);
-        weekIndex.addAll([1, 2, 3, 4, 5, 6, 7]);
+        _weekHeaders.addAll(["M", "T", "W", "T", "F", "S", "S"]);
+        _weekIndex.addAll([1, 2, 3, 4, 5, 6, 7]);
         break;
       case DateTime.sunday:
-        weekHeaders.addAll(["S", "M", "T", "W", "T", "F", "S"]);
-        weekIndex.addAll([7, 1, 2, 3, 4, 5, 6]);
+        _weekHeaders.addAll(["S", "M", "T", "W", "T", "F", "S"]);
+        _weekIndex.addAll([7, 1, 2, 3, 4, 5, 6]);
         break;
       default:
-        weekHeaders.addAll(["S", "S", "M", "T", "W", "T", "F"]);
-        weekIndex.addAll([6, 7, 1, 2, 3, 4, 5]);
+        _weekHeaders.addAll(["S", "S", "M", "T", "W", "T", "F"]);
+        _weekIndex.addAll([6, 7, 1, 2, 3, 4, 5]);
     }
 
     noOfDaysInMonth = Calendar.getNoOfDaysInMonth(dateTime.month, dateTime.year);
 
     DateTime firstDayOfMonth = dateTime.firstDayOfMonth;
-    firstDayOffset = weekIndex.indexWhere((element) => element == firstDayOfMonth.weekday);
+    _firstDayOffset = _weekIndex.indexWhere((element) => element == firstDayOfMonth.weekday);
+
+    debugPrint('_CalendarMonth._CalendarMonth: $selectedDateTime');
   }
 
   @override
   Widget build(BuildContext context) {
     double cellWidth = width / weekIterator;
-    int totalDateTiles = (noOfDaysInMonth + firstDayOffset);
+    int totalDateTiles = (noOfDaysInMonth + _firstDayOffset);
     int requiredRows = (totalDateTiles / weekIterator).ceil();
+
     Orientation orientation = MediaQuery.of(context).orientation;
-    bool showExtendedDate = orientation == Orientation.portrait;
+    bool showExtendedDate = (orientation == Orientation.portrait);
 
     if (postBuildCallback != null) {
       SchedulerBinding.instance?.addPostFrameCallback((_) {
@@ -338,7 +367,7 @@ class _CalendarMonth extends StatelessWidget {
               height: weekHeaderHeight,
               width: MediaQuery.of(context).size.width,
               child: Row(
-                children: weekHeaders
+                children: _weekHeaders
                     .map(
                       (e) => SizedBox(
                         width: cellWidth,
@@ -364,25 +393,45 @@ class _CalendarMonth extends StatelessWidget {
                   Builder(
                     builder: (context) {
                       int index = weekIterator * i + j;
-                      int date = index - firstDayOffset + 1;
+                      int date = index - _firstDayOffset + 1;
                       bool isValid = date > 0 && date <= noOfDaysInMonth;
+
+                      bool isSelected =
+                          selectedDateTime != null && (DateTime(dateTime.year, dateTime.month, date).compareTo(selectedDateTime!.absolute) == 0);
                       return Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            width: cellWidth,
-                            height: cellWidth - (showExtendedDate ? 0 : 12),
-                            child: isValid
-                                ? Center(
-                                    child: Text(
-                                      date.toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  )
-                                : null,
+                          Builder(
+                            builder: (context) {
+                              return SizedBox(
+                                width: cellWidth,
+                                height: cellWidth - (showExtendedDate ? 0 : 18),
+                                child: isValid
+                                    ? Center(
+                                        child: Material(
+                                          color: isSelected ? Colors.grey : Colors.transparent,
+                                          shape: const ContinuousRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                                          ),
+                                          child: SizedBox(
+                                            height: 22,
+                                            width: 22,
+                                            child: Center(
+                                              child: Text(
+                                                date.toString(),
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : null,
+                              );
+                            },
                           ),
                           const SizedBox(
                             height: 6.0,
@@ -402,13 +451,11 @@ class _CalendarMonth extends StatelessWidget {
 class _CalendarPickerWidget extends StatefulWidget {
   final DateTime initialDateTime;
   final DateTime selectedDateTime;
-  final void Function(DateTime)? onDatePicked;
 
   const _CalendarPickerWidget({
     Key? key,
     required this.initialDateTime,
     required this.selectedDateTime,
-    this.onDatePicked,
   }) : super(key: key);
 
   @override
@@ -416,8 +463,7 @@ class _CalendarPickerWidget extends StatefulWidget {
 }
 
 class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
-  late DateTime dateTime;
-  late DateTime _selectedDate;
+  late ValueNotifier<DateTime> _dateTime;
   final GlobalKey<_CalendarState> _calendarKey = GlobalKey();
 
   Orientation currentOrientation = Orientation.portrait;
@@ -426,8 +472,8 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
   void initState() {
     super.initState();
 
-    dateTime = widget.initialDateTime;
-    _selectedDate = widget.selectedDateTime;
+    _dateTime = ValueNotifier(widget.initialDateTime);
+    // _selectedDate = widget.selectedDateTime;
   }
 
   @override
@@ -454,7 +500,10 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
       child: Wrap(
         children: [
           Container(
-            color: const Color(0xFF26292E),
+            decoration: const BoxDecoration(
+              color: Color(0xFF26292E),
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
+            ),
             child: Flex(
               direction: isPortrait ? Axis.vertical : Axis.horizontal,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -465,45 +514,48 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                     left: 20.0,
                     top: (!isPortrait ? 30.0 : 0.0),
                   ),
-                  child: isPortrait
-                      ? Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: Text(
-                            DateFormat("MMMM d, EEEE yyyy").format(dateTime),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.0,
-                              color: Colors.white,
+                  child: ValueListenableBuilder<DateTime>(
+                    valueListenable: _dateTime,
+                    builder: (context, value, child) => isPortrait
+                        ? Container(
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text(
+                              DateFormat("MMMM d, EEEE yyyy").format(value),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        : RichText(
+                            text: TextSpan(
+                              text: DateFormat("yyyy\n").format(value),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12.0,
+                                color: Colors.grey,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: DateFormat("EEEE\n").format(value),
+                                  style: const TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: DateFormat("d MMMM").format(value),
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                      : RichText(
-                          text: TextSpan(
-                            text: DateFormat("yyyy\n").format(dateTime),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12.0,
-                              color: Colors.grey,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: DateFormat("EEEE\n").format(dateTime),
-                                style: const TextStyle(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              TextSpan(
-                                text: DateFormat("d MMMM").format(dateTime),
-                                style: const TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                  ),
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -522,6 +574,7 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                             year: 2022,
                             showMonthInHeader: true,
                             showMonthActionButtons: true,
+                            onDatePicked: _onDatePicked,
                           ),
                         ),
                       ),
@@ -564,7 +617,7 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                             Material(
                               color: Colors.grey,
                               child: InkWell(
-                                onTap: () => Navigator.pop(context, _selectedDate),
+                                onTap: () => Navigator.pop(context, _dateTime.value),
                                 child: const Padding(
                                   padding: EdgeInsets.symmetric(
                                     vertical: 10.0,
@@ -591,5 +644,9 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
         ],
       ),
     );
+  }
+
+  void _onDatePicked(DateTime pickedDate) {
+    _dateTime.value = pickedDate;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:calendar/calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(
@@ -10,8 +11,21 @@ void main() {
   );
 }
 
-class BaseWidget extends StatelessWidget {
+class BaseWidget extends StatefulWidget {
   const BaseWidget({Key? key}) : super(key: key);
+
+  @override
+  State<BaseWidget> createState() => _BaseWidgetState();
+}
+
+class _BaseWidgetState extends State<BaseWidget> {
+  late ValueNotifier<DateTime> _dateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateTime = ValueNotifier(DateTime.now());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,51 +49,73 @@ class BaseWidget extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 1,
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.125,
-                    child: Center(
-                      child: Material(
-                        color: const Color(0xFF263238),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(10.0),
-                          ),
-                          side: BorderSide(
-                            color: Color(0xFF29434e),
-                            width: 2,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: ValueListenableBuilder<DateTime>(
+                            valueListenable: _dateTime,
+                            builder: (context, value, child) {
+                              return _DateText(value);
+                            }
                           ),
                         ),
-                        child: InkWell(
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(10.0),
-                          ),
-                          onTap: () => _showCalendarDialog(context),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10.0,
-                              horizontal: 15.0,
+                      ),
+                      const SizedBox(
+                        height: 30.0,
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: Material(
+                            color: const Color(0xFF263238),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
+                              side: BorderSide(
+                                color: Color(0xFF29434e),
+                                width: 2,
+                              ),
                             ),
-                            child: const Text(
-                              "Show Dialog",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14.0,
-                                fontWeight: FontWeight.w500,
+                            child: InkWell(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(10.0),
+                              ),
+                              onTap: () => _showCalendarDialog(context),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0,
+                                  horizontal: 15.0,
+                                ),
+                                child: const Text(
+                                  "Show Dialog",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                const Expanded(
+                Expanded(
                   flex: 2,
-                  child: Center(child: CalendarWidget()),
+                  child: CalendarWidget(
+                    selectedDateTime: _dateTime.value,
+                    onMonthChanged: (index, dateTime) => _dateTime.value = dateTime,
+                  ),
                 ),
               ],
             );
-          }
+          },
         ),
       ),
     );
@@ -87,5 +123,36 @@ class BaseWidget extends StatelessWidget {
 
   void _showCalendarDialog(BuildContext context) async {
     Calendar.showDatePickerDialog(context, DateTime.now());
+  }
+}
+
+class _DateText extends StatelessWidget {
+  final DateTime dateTime;
+
+  const _DateText(this.dateTime, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: RichText(
+        text: TextSpan(
+          text: DateFormat("yyyy\n").format(dateTime),
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12.0,
+            color: Colors.grey,
+          ),
+          children: [
+            TextSpan(
+              text: DateFormat("MMMM").format(dateTime),
+              style: const TextStyle(
+                fontSize: 22,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

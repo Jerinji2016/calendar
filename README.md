@@ -1,16 +1,13 @@
-# calendar
+# Calendar
 
-Calendar Widget
+App that has Calendar Widget
 
-## Getting Started
+- Home screen has a calendar widget which just shows a month and current date
+- Also has a button to show a dialog which can be used to pick a date.  
+  The dialog on dismiss shows return a supplied _dateTime_ or the _picked dateTime_
 
-This project is a starting point for a Flutter application.
+***
 
-A few resources to get you started if this is your first Flutter project:
+##  Screenshots
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+_Coming soon..._
