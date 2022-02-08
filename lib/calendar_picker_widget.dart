@@ -48,7 +48,7 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
 
     bool isPortrait = newOrientation == Orientation.portrait;
     Size size = MediaQuery.of(context).size;
-    double width = isPortrait ? size.width - 60 : size.height - 100;
+    double width = isPortrait ? size.width - 80 : size.height - 100;
 
     return Center(
       child: Wrap(
@@ -68,47 +68,10 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                     left: 20.0,
                     top: (!isPortrait ? 30.0 : 0.0),
                   ),
-                  child: ValueListenableBuilder<DateTime>(
-                    valueListenable: _dateTime,
-                    builder: (context, value, child) => isPortrait
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Text(
-                              DateFormat("MMMM d, EEEE yyyy").format(value),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
-                        : RichText(
-                            text: TextSpan(
-                              text: DateFormat("yyyy\n").format(value),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12.0,
-                                color: Colors.grey,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: DateFormat("EEEE\n").format(value),
-                                  style: const TextStyle(
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: DateFormat("d MMMM").format(value),
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                  child: _DateTimeTitle(
+                    _dateTime,
+                    onMonthTapped: _onMonthTapped,
+                    onYearTapped: _onYearTapped,
                   ),
                 ),
                 Container(
@@ -133,61 +96,16 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                           ),
                         ),
                       ),
+                      if (isPortrait) const SizedBox(height: 10.0),
                       Container(
                         padding: EdgeInsets.only(
                           bottom: 15.0,
                           right: 15.0,
                           top: (isPortrait ? 0.0 : 10.0),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Material(
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                side: BorderSide(
-                                  width: 1.0,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => Navigator.pop(context, widget.selectedDateTime),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal: 20.0,
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20.0),
-                            Material(
-                              color: Colors.grey,
-                              child: InkWell(
-                                onTap: () => Navigator.pop(context, _dateTime.value),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal: 20.0,
-                                  ),
-                                  child: Text(
-                                    'Ok',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
+                        child: _FooterButton(
+                          onOKTapped: () => Navigator.pop(context, _dateTime.value),
+                          onCancelTapped: () => Navigator.pop(context, widget.selectedDateTime),
                         ),
                       )
                     ],
@@ -201,7 +119,80 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
     );
   }
 
+  void _onMonthTapped() {
+    debugPrint('_CalendarPickerWidgetState._onMonthTapped: ');
+  }
+
+  void _onYearTapped() {
+    debugPrint('_CalendarPickerWidgetState._onYearTapped: ');
+  }
+
   void _onDatePicked(DateTime pickedDate) {
     _dateTime.value = pickedDate;
+  }
+}
+
+class _FooterButton extends StatelessWidget {
+  final void Function() onOKTapped;
+  final void Function() onCancelTapped;
+
+  const _FooterButton({
+    Key? key,
+    required this.onCancelTapped,
+    required this.onOKTapped,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Material(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(2.0)),
+            side: BorderSide(
+              width: 1.0,
+              color: Colors.grey,
+            ),
+          ),
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onCancelTapped,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 20.0,
+              ),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 20.0),
+        Material(
+          color: Colors.grey,
+          child: InkWell(
+            onTap: onOKTapped,
+            child: const Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 10.0,
+                horizontal: 20.0,
+              ),
+              child: Text(
+                'Ok',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
   }
 }
