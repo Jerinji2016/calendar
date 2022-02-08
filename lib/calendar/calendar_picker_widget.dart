@@ -220,12 +220,13 @@ class _YearPicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int startingYear = selectedYear - (selectedYear % 16) + 1;
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
 
     return Center(
       child: Material(
         color: Colors.transparent,
         child: SizedBox(
-          height: _widgetControllerHeight + 20 + (4 * cellHeight),
+          height: _widgetControllerHeight + (isPortrait ? 20 : -10) + (4 * cellHeight + (isPortrait ? 0 : -10.0)),
           child: Stack(
             children: [
               PageView.builder(
@@ -256,7 +257,7 @@ class _YearPicker extends StatelessWidget {
                           crossAxisCount: 4,
                           mainAxisSpacing: 0.0,
                           crossAxisSpacing: 0.0,
-                          mainAxisExtent: cellHeight,
+                          mainAxisExtent: cellHeight + (isPortrait ? 0 : -10.0),
                         ),
                         itemBuilder: (context, index) {
                           int year = fromYear + index;
