@@ -1,4 +1,4 @@
-import 'calendar.dart';
+import 'calendar/calendar.dart';
 
 extension DateTimeExtension on DateTime {
   DateTime get firstDayOfMonth => DateTime(year, month, 1);
