@@ -17,6 +17,7 @@ part 'datetime_title.dart';
 part 'page_controller_buttons.dart';
 
 const double _widgetControllerHeight = 45.0;
+const Duration _pageTransitionDuration = Duration(milliseconds: 300);
 
 class Calendar {
   static int getNoOfDaysInMonth(int month, int year) {

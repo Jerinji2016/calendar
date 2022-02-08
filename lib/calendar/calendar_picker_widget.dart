@@ -1,5 +1,7 @@
 part of 'calendar.dart';
 
+final double cellHeight = 60.0;
+
 /// Abstract class: should not be imported!
 class _CalendarPickerWidget extends StatefulWidget {
   final DateTime initialDateTime;
@@ -143,11 +145,17 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> with Ticke
                                   );
                                   break;
                                 case _PickerMode.month:
-                                  child = Container();
+                                  child = _MonthPicker(
+                                    onMonthPicked: (month, year) {
+                                      _dateTime.value = _dateTime.value.copyWith(month: month, year: year);
+                                      _changeTo(_PickerMode.date);
+                                    },
+                                    selectedMonth: _dateTime.value.month,
+                                    selectedYear: _dateTime.value.year,
+                                  );
                                   break;
                                 case _PickerMode.year:
                                   child = _YearPicker(
-                                      width: width,
                                       selectedYear: _dateTime.value.year,
                                       onYearPicked: (year) {
                                         _dateTime.value = _dateTime.value.copyWith(year: year);
@@ -195,11 +203,8 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> with Ticke
 }
 
 class _YearPicker extends StatelessWidget {
-  final double width;
   final int selectedYear;
   final void Function(int year) onYearPicked;
-
-  final double cellHeight = 60.0;
 
   final PageController _pageController = PageController(
     initialPage: 100,
@@ -208,7 +213,6 @@ class _YearPicker extends StatelessWidget {
 
   _YearPicker({
     Key? key,
-    required this.width,
     required this.onYearPicked,
     required this.selectedYear,
   }) : super(key: key);
@@ -221,7 +225,7 @@ class _YearPicker extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: SizedBox(
-          height: _widgetControllerHeight + 25 + (4 * cellHeight),
+          height: _widgetControllerHeight + 20 + (4 * cellHeight),
           child: Stack(
             children: [
               PageView.builder(
@@ -238,7 +242,7 @@ class _YearPicker extends StatelessWidget {
                         height: _widgetControllerHeight,
                         child: Center(
                           child: Text(
-                            "$fromYear-$toYear",
+                            "$fromYear - $toYear",
                             style: const TextStyle(
                               fontSize: 14.0,
                               color: Colors.white,
@@ -246,7 +250,7 @@ class _YearPicker extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 25.0),
+                      const SizedBox(height: 15.0),
                       GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -290,8 +294,131 @@ class _YearPicker extends StatelessWidget {
               ),
               _PageControllerButtons(
                 buttonSize: _widgetControllerHeight,
-                onBackwardButtonTap: () {},
-                onForwardButtonTap: () {},
+                onBackwardButtonTap: () => _pageController.previousPage(
+                  duration: _pageTransitionDuration,
+                  curve: Curves.ease,
+                ),
+                onForwardButtonTap: () => _pageController.nextPage(
+                  duration: _pageTransitionDuration,
+                  curve: Curves.ease,
+                ),
+                backgroundColor: Colors.black45,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MonthPicker extends StatelessWidget {
+  final List<String> months = const ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  final void Function(int month, int year) onMonthPicked;
+  final int selectedMonth;
+  final int selectedYear;
+
+  static const int _pageOffset = 1000;
+
+  final PageController _pageController = PageController(
+    initialPage: _pageOffset,
+    keepPage: true,
+  );
+
+  _MonthPicker({
+    Key? key,
+    required this.onMonthPicked,
+    required this.selectedMonth,
+    required this.selectedYear,
+  }) : super(key: key);
+
+  int _getCurrentYear(int index) => selectedYear + (index - _pageOffset);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: SizedBox(
+          height: _widgetControllerHeight + 25 + (3 * cellHeight),
+          child: Stack(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: _widgetControllerHeight,
+                    child: PageView.builder(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          int year = _getCurrentYear(index);
+
+                          return Center(
+                            child: Text(
+                              "$year",
+                              style: const TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                  const SizedBox(height: 25.0),
+                  GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: 0.0,
+                      crossAxisSpacing: 0.0,
+                      mainAxisExtent: cellHeight,
+                    ),
+                    itemBuilder: (context, index) {
+                      int month = index + 1;
+                      return InkWell(
+                        onTap: () {
+                          int currentPageIndex = _pageController.page!.toInt();
+                          onMonthPicked.call(month, _getCurrentYear(currentPageIndex));
+                        },
+                        child: Container(
+                          decoration: (month == selectedMonth)
+                              ? const BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(2.0)),
+                                  border: Border.symmetric(
+                                    vertical: BorderSide(color: Colors.grey, width: 1.0),
+                                    horizontal: BorderSide(color: Colors.grey, width: 1.0),
+                                  ),
+                                )
+                              : null,
+                          child: Center(
+                            child: Text(
+                              months[index],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: 3 * 4,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              _PageControllerButtons(
+                buttonSize: _widgetControllerHeight,
+                onBackwardButtonTap: () => _pageController.previousPage(
+                  duration: _pageTransitionDuration,
+                  curve: Curves.ease,
+                ),
+                onForwardButtonTap: () => _pageController.nextPage(
+                  duration: _pageTransitionDuration,
+                  curve: Curves.ease,
+                ),
                 backgroundColor: Colors.black45,
               )
             ],

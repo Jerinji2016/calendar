@@ -1,8 +1,8 @@
 part of 'calendar.dart';
 
 class _PageControllerButtons extends StatelessWidget {
-  final void Function() onForwardButtonTap;
-  final void Function() onBackwardButtonTap;
+  final void Function()? onForwardButtonTap;
+  final void Function()? onBackwardButtonTap;
   final double buttonSize;
   final Color backgroundColor;
 
