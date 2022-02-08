@@ -14,6 +14,8 @@ part 'calendar_picker_widget.dart';
 
 part 'datetime_title.dart';
 
+part 'page_controller_buttons.dart';
+
 class Calendar {
   static int getNoOfDaysInMonth(int month, int year) {
     bool isLeapYear = year % 4 == 0;
@@ -218,67 +220,11 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
 
             //  Change month buttons
             if (widget.showMonthActionButtons)
-              Container(
-                decoration: const BoxDecoration(
-                  border: Border.symmetric(
-                    horizontal: BorderSide(
-                      color: Colors.black45,
-                      width: 1.0,
-                    ),
-                  ),
-                  // color: Color(0xFF202123),
-                ),
-                height: _widgetControllerHeight,
-                child: Center(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => _onMonthChanged(_prevMonth),
-                              highlightColor: Colors.transparent,
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(22.5),
-                              ),
-                              child: const SizedBox(
-                                height: _widgetControllerHeight,
-                                width: _widgetControllerHeight,
-                                child: Icon(
-                                  Icons.keyboard_arrow_left,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: InkWell(
-                            highlightColor: Colors.transparent,
-                            onTap: () => _onMonthChanged(_nextMonth),
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(22.5),
-                            ),
-                            child: const SizedBox(
-                              height: _widgetControllerHeight,
-                              width: _widgetControllerHeight,
-                              child: Icon(
-                                Icons.keyboard_arrow_right,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+              _PageControllerButtons(
+                buttonSize: _widgetControllerHeight,
+                onBackwardButtonTap: () => _onMonthChanged(_prevMonth),
+                onForwardButtonTap: () => _onMonthChanged(_nextMonth),
+                backgroundColor: Colors.black45,
               ),
           ],
         ),
