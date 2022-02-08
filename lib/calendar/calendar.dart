@@ -16,6 +16,8 @@ part 'datetime_title.dart';
 
 part 'page_controller_buttons.dart';
 
+const double _widgetControllerHeight = 45.0;
+
 class Calendar {
   static int getNoOfDaysInMonth(int month, int year) {
     bool isLeapYear = year % 4 == 0;
@@ -46,7 +48,6 @@ class Calendar {
           ),
           child: _CalendarPickerWidget(
             initialDateTime: initialDateTime,
-            selectedDateTime: DateTime.now(),
           ),
         ),
       );
@@ -108,14 +109,13 @@ class _CalendarWrapper extends StatefulWidget {
 
 class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderStateMixin {
   static const int infinitePageOffset = 999;
-  static const double _widgetControllerHeight = 45.0;
   static const int _nextMonth = 1, _prevMonth = -1;
 
-  late final PageController _monthPageController = PageController(
+  final PageController _monthPageController = PageController(
     initialPage: infinitePageOffset,
     keepPage: true,
   );
-  final DateTime dateTime = DateTime(2021, 10, 2);
+  late DateTime dateTime;
   late DateTime? _selectedDateTime;
 
   //  caches height value on changing page
@@ -131,8 +131,10 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
     super.initState();
 
     _selectedDateTime = widget.selectedDateTime;
+    (widget.selectedDateTime != null) ? dateTime = _selectedDateTime! : DateTime(widget.year, widget.month, 1);
+
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 200)).then(
+      Future.delayed(const Duration(milliseconds: 50)).then(
         (_) => _onPageChanged(_monthPageController.page!.toInt(), false),
       );
     });
@@ -152,81 +154,85 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('_CalendarWrapperState.build: ');
     double calendarWidth = widget.width ?? _getDefaultWidth();
 
-    return ValueListenableBuilder<int>(
-      valueListenable: weekStart,
-      builder: (context, value, child) => SizedBox(
-        height: _dynamicCalendarHeight + (widget.showMonthInHeader ? _widgetControllerHeight : 0.0) + 10,
-        child: Stack(
-          children: [
-            //  Actual calendar
-            PageView.builder(
-              controller: _monthPageController,
-              onPageChanged: _onPageChanged,
-              itemBuilder: (context, index) {
-                DateTime dateDelegate = _getDateTimeFromIndex(index);
-                DateFormat headerMonthFormat = DateFormat(dateDelegate.year == DateTime.now().year ? "MMMM" : "MMMM y");
+    return Material(
+      color: Colors.transparent,
+      child: ValueListenableBuilder<int>(
+        valueListenable: weekStart,
+        builder: (context, value, child) => SizedBox(
+          height: _dynamicCalendarHeight + (widget.showMonthInHeader ? _widgetControllerHeight : 0.0) + 10,
+          child: Stack(
+            children: [
+              //  Actual calendar
+              PageView.builder(
+                controller: _monthPageController,
+                onPageChanged: _onPageChanged,
+                itemBuilder: (context, index) {
+                  DateTime dateDelegate = _getDateTimeFromIndex(index);
+                  DateFormat headerMonthFormat = DateFormat(dateDelegate.year == DateTime.now().year ? "MMMM" : "MMMM y");
 
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (widget.showMonthInHeader)
-                      SizedBox(
-                        height: _widgetControllerHeight,
-                        child: Center(
-                          child: Text(
-                            headerMonthFormat.format(dateDelegate),
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              color: Colors.white,
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (widget.showMonthInHeader)
+                        SizedBox(
+                          height: _widgetControllerHeight,
+                          child: Center(
+                            child: Text(
+                              headerMonthFormat.format(dateDelegate),
+                              style: const TextStyle(
+                                fontSize: 14.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: Container(
+                          width: calendarWidth,
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4.0),
+                          ),
+                          child: SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: _CalendarMonth(
+                              dateTime: dateDelegate,
+                              width: calendarWidth,
+                              weekStart: value,
+                              selectedDateTime: _selectedDateTime,
+                              onDatePicked: widget.onDatePicked != null
+                                  ? (date) {
+                                      _selectedDateTime = date;
+                                      widget.onDatePicked?.call(date);
+                                      setState(() {});
+                                    }
+                                  : null,
+                              disableDateBefore: widget.disableDateBefore,
+                              postBuildCallback: (Size widgetSize) {
+                                if (_newHeight != widgetSize.height) _newHeight = widgetSize.height;
+                              },
                             ),
                           ),
                         ),
                       ),
-                    Expanded(
-                      child: Container(
-                        width: calendarWidth,
-                        padding: const EdgeInsets.symmetric(vertical: 10.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        child: SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: _CalendarMonth(
-                            dateTime: dateDelegate,
-                            width: calendarWidth,
-                            weekStart: value,
-                            selectedDateTime: _selectedDateTime,
-                            onDatePicked: widget.onDatePicked != null
-                                ? (date) {
-                                    _selectedDateTime = date;
-                                    widget.onDatePicked?.call(date);
-                                    setState(() {});
-                                  }
-                                : null,
-                            disableDateBefore: widget.disableDateBefore,
-                            postBuildCallback: (Size widgetSize) {
-                              if (_newHeight != widgetSize.height) _newHeight = widgetSize.height;
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-
-            //  Change month buttons
-            if (widget.showMonthActionButtons)
-              _PageControllerButtons(
-                buttonSize: _widgetControllerHeight,
-                onBackwardButtonTap: () => _onMonthChanged(_prevMonth),
-                onForwardButtonTap: () => _onMonthChanged(_nextMonth),
-                backgroundColor: Colors.black45,
+                    ],
+                  );
+                },
               ),
-          ],
+
+              //  Change month buttons
+              if (widget.showMonthActionButtons)
+                _PageControllerButtons(
+                  buttonSize: _widgetControllerHeight,
+                  onBackwardButtonTap: () => _onMonthChanged(_prevMonth),
+                  onForwardButtonTap: () => _onMonthChanged(_nextMonth),
+                  backgroundColor: Colors.black45,
+                ),
+            ],
+          ),
         ),
       ),
     );
