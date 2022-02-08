@@ -155,7 +155,6 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('_CalendarWrapperState.build: ');
     double calendarWidth = widget.width ?? _getDefaultWidth();
 
     return Material(
