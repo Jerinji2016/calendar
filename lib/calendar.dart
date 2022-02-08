@@ -8,6 +8,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 
+part 'calendar_month.dart';
+part 'calendar_picker_widget.dart';
+
 class Calendar {
   static int getNoOfDaysInMonth(int month, int year) {
     bool isLeapYear = year % 4 == 0;
@@ -56,7 +59,7 @@ class CalendarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Calendar(
+    return _CalendarWrapper(
       month: DateTime.february,
       year: 2022,
       selectedDateTime: selectedDateTime,
@@ -65,7 +68,7 @@ class CalendarWidget extends StatelessWidget {
   }
 }
 
-class _Calendar extends StatefulWidget {
+class _CalendarWrapper extends StatefulWidget {
   final int month;
   final int year;
 
@@ -80,7 +83,7 @@ class _Calendar extends StatefulWidget {
 
   final double? width;
 
-  const _Calendar({
+  const _CalendarWrapper({
     Key? key,
     required this.month,
     required this.year,
@@ -94,10 +97,10 @@ class _Calendar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CalendarState createState() => _CalendarState();
+  _CalendarWrapperState createState() => _CalendarWrapperState();
 }
 
-class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
+class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderStateMixin {
   static const int infinitePageOffset = 999;
   static const double _widgetControllerHeight = 45.0;
   static const int _nextMonth = 1, _prevMonth = -1;
@@ -298,380 +301,4 @@ class _CalendarState extends State<_Calendar> with TickerProviderStateMixin {
           duration: const Duration(milliseconds: 300),
           curve: Curves.ease,
         );
-}
-
-class _CalendarMonth extends StatelessWidget {
-  static const double weekHeaderHeight = 36.0;
-  static const int weekIterator = 7;
-
-  final DateTime dateTime;
-  final DateTime? selectedDateTime;
-  final DateTime? disableDateBefore;
-
-  final double width;
-  final int weekStart;
-
-  final Function(Size widgetSize)? postBuildCallback;
-  final Function(DateTime datePicked)? onDatePicked;
-
-  final List<String> _weekHeaders = [];
-  final List<int> _weekIndex = [];
-
-  late final int _firstDayOffset;
-  late final int noOfDaysInMonth;
-
-  _CalendarMonth({
-    Key? key,
-    required this.dateTime,
-    required this.width,
-    required this.weekStart,
-    this.selectedDateTime,
-    this.disableDateBefore,
-    this.postBuildCallback,
-    this.onDatePicked,
-  }) : super(key: key) {
-    switch (weekStart) {
-      case DateTime.monday:
-        _weekHeaders.addAll(["M", "T", "W", "T", "F", "S", "S"]);
-        _weekIndex.addAll([1, 2, 3, 4, 5, 6, 7]);
-        break;
-      case DateTime.sunday:
-        _weekHeaders.addAll(["S", "M", "T", "W", "T", "F", "S"]);
-        _weekIndex.addAll([7, 1, 2, 3, 4, 5, 6]);
-        break;
-      default:
-        _weekHeaders.addAll(["S", "S", "M", "T", "W", "T", "F"]);
-        _weekIndex.addAll([6, 7, 1, 2, 3, 4, 5]);
-    }
-
-    noOfDaysInMonth = Calendar.getNoOfDaysInMonth(dateTime.month, dateTime.year);
-
-    DateTime firstDayOfMonth = dateTime.firstDayOfMonth;
-    _firstDayOffset = _weekIndex.indexWhere((element) => element == firstDayOfMonth.weekday);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double cellWidth = width / weekIterator;
-    int totalDateTiles = (noOfDaysInMonth + _firstDayOffset);
-    int requiredRows = (totalDateTiles / weekIterator).ceil();
-
-    Orientation orientation = MediaQuery.of(context).orientation;
-    bool showExtendedDate = (orientation == Orientation.portrait);
-
-    if (postBuildCallback != null) {
-      SchedulerBinding.instance?.addPostFrameCallback((_) {
-        try {
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          postBuildCallback!.call(renderBox.size);
-        } catch (e) {
-          //  ignore catch block
-        }
-      });
-    }
-
-    return SizedBox(
-      width: width,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            child: SizedBox(
-              height: weekHeaderHeight,
-              width: MediaQuery.of(context).size.width,
-              child: Row(
-                children: _weekHeaders
-                    .map(
-                      (e) => SizedBox(
-                        width: cellWidth,
-                        child: Center(
-                          child: Text(
-                            e,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              color: Color(0xFF989DB3),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          ),
-          for (int i = 0; i < requiredRows; i++)
-            Row(
-              children: [
-                for (int j = 0; j < weekIterator; j++)
-                  Builder(
-                    builder: (context) {
-                      int index = weekIterator * i + j;
-                      int date = index - _firstDayOffset + 1;
-                      bool isValid = date > 0 && date <= noOfDaysInMonth;
-
-                      DateTime thisDay = DateTime(dateTime.year, dateTime.month, date);
-                      bool isSelected = selectedDateTime != null && (thisDay.compareTo(selectedDateTime!.absolute) == 0);
-                      bool isDisabled = disableDateBefore != null && thisDay.compareTo(disableDateBefore!.absolute) < 0;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Builder(
-                            builder: (context) {
-                              return SizedBox(
-                                width: cellWidth,
-                                height: cellWidth - (showExtendedDate ? 0 : 18),
-                                child: isValid
-                                    ? Center(
-                                        child: Material(
-                                          color: isSelected ? Colors.grey : Colors.transparent,
-                                          shape: const ContinuousRectangleBorder(
-                                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                                          ),
-                                          child: InkWell(
-                                            splashColor: Colors.transparent,
-                                            customBorder: const ContinuousRectangleBorder(
-                                              borderRadius: BorderRadius.all(Radius.circular(20)),
-                                            ),
-                                            onTap: isDisabled ? null : () => onDatePicked?.call(thisDay),
-                                            child: SizedBox(
-                                              height: 22,
-                                              width: 22,
-                                              child: Center(
-                                                child: Text(
-                                                  date.toString(),
-                                                  textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                    color: isDisabled ? Colors.grey : Colors.white,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : null,
-                              );
-                            },
-                          ),
-                          const SizedBox(
-                            height: 6.0,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-              ],
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CalendarPickerWidget extends StatefulWidget {
-  final DateTime initialDateTime;
-  final DateTime selectedDateTime;
-  final DateTime? disableDatesBefore;
-
-  const _CalendarPickerWidget({
-    Key? key,
-    required this.initialDateTime,
-    required this.selectedDateTime,
-    this.disableDatesBefore,
-  }) : super(key: key);
-
-  @override
-  State<_CalendarPickerWidget> createState() => _CalendarPickerWidgetState();
-}
-
-class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
-  late ValueNotifier<DateTime> _dateTime;
-  final GlobalKey<_CalendarState> _calendarKey = GlobalKey();
-
-  Orientation currentOrientation = Orientation.portrait;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _dateTime = ValueNotifier(widget.initialDateTime);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Orientation newOrientation = MediaQuery.of(context).orientation;
-    if (newOrientation != currentOrientation) {
-      SchedulerBinding.instance?.addPostFrameCallback(
-        (_) => Future.delayed(const Duration(milliseconds: 600)).then(
-          (__) => setState(
-            () {
-              currentOrientation = newOrientation;
-              _calendarKey.currentState?.refreshWidget();
-            },
-          ),
-        ),
-      );
-    }
-
-    bool isPortrait = newOrientation == Orientation.portrait;
-    Size size = MediaQuery.of(context).size;
-    double width = isPortrait ? size.width - 60 : size.height - 100;
-
-    return Center(
-      child: Wrap(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF26292E),
-              borderRadius: BorderRadius.all(Radius.circular(4.0)),
-            ),
-            child: Flex(
-              direction: isPortrait ? Axis.vertical : Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    left: 20.0,
-                    top: (!isPortrait ? 30.0 : 0.0),
-                  ),
-                  child: ValueListenableBuilder<DateTime>(
-                    valueListenable: _dateTime,
-                    builder: (context, value, child) => isPortrait
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(vertical: 20.0),
-                            child: Text(
-                              DateFormat("MMMM d, EEEE yyyy").format(value),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.0,
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
-                        : RichText(
-                            text: TextSpan(
-                              text: DateFormat("yyyy\n").format(value),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 12.0,
-                                color: Colors.grey,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: DateFormat("EEEE\n").format(value),
-                                  style: const TextStyle(
-                                    fontSize: 22.0,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: DateFormat("d MMMM").format(value),
-                                  style: const TextStyle(
-                                    fontSize: 18.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                  ),
-                ),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      SizedBox(
-                        width: width,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: _Calendar(
-                            key: _calendarKey,
-                            width: width,
-                            month: DateTime.february,
-                            disableDateBefore: DateTime(2021, 09, 22),
-                            year: 2022,
-                            showMonthInHeader: true,
-                            showMonthActionButtons: true,
-                            onDatePicked: _onDatePicked,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(
-                          bottom: 15.0,
-                          right: 15.0,
-                          top: (isPortrait ? 0.0 : 10.0),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Material(
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(2.0)),
-                                side: BorderSide(
-                                  width: 1.0,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => Navigator.pop(context, widget.selectedDateTime),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal: 20.0,
-                                  ),
-                                  child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20.0),
-                            Material(
-                              color: Colors.grey,
-                              child: InkWell(
-                                onTap: () => Navigator.pop(context, _dateTime.value),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal: 20.0,
-                                  ),
-                                  child: Text(
-                                    'Ok',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _onDatePicked(DateTime pickedDate) {
-    _dateTime.value = pickedDate;
-  }
 }
