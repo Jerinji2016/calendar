@@ -85,18 +85,18 @@ class _CalendarMonth extends StatelessWidget {
                 children: _weekHeaders
                     .map(
                       (e) => SizedBox(
-                    width: cellWidth,
-                    child: Center(
-                      child: Text(
-                        e,
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          color: Color(0xFF989DB3),
+                        width: cellWidth,
+                        child: Center(
+                          child: Text(
+                            e,
+                            style: const TextStyle(
+                              fontSize: 14.0,
+                              color: Color(0xFF989DB3),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                )
+                    )
                     .toList(),
               ),
             ),
@@ -124,34 +124,34 @@ class _CalendarMonth extends StatelessWidget {
                                 height: cellWidth - (showExtendedDate ? 0 : 18),
                                 child: isValid
                                     ? Center(
-                                  child: Material(
-                                    color: isSelected ? Colors.grey : Colors.transparent,
-                                    shape: const ContinuousRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    child: InkWell(
-                                      splashColor: Colors.transparent,
-                                      customBorder: const ContinuousRectangleBorder(
-                                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                                      ),
-                                      onTap: isDisabled ? null : () => onDatePicked?.call(thisDay),
-                                      child: SizedBox(
-                                        height: 22,
-                                        width: 22,
-                                        child: Center(
-                                          child: Text(
-                                            date.toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              color: isDisabled ? Colors.grey : Colors.white,
-                                              fontSize: 12,
+                                        child: Material(
+                                          color: isSelected ? Colors.grey : Colors.transparent,
+                                          shape: const ContinuousRectangleBorder(
+                                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                                          ),
+                                          child: InkWell(
+                                            splashColor: Colors.transparent,
+                                            customBorder: const ContinuousRectangleBorder(
+                                              borderRadius: BorderRadius.all(Radius.circular(20)),
+                                            ),
+                                            onTap: isDisabled ? null : () => onDatePicked?.call(thisDay),
+                                            child: SizedBox(
+                                              height: 22,
+                                              width: 22,
+                                              child: Center(
+                                                child: Text(
+                                                  date.toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    color: isDisabled ? Colors.grey : Colors.white,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                )
+                                      )
                                     : null,
                               );
                             },

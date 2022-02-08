@@ -34,9 +34,9 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
     Orientation newOrientation = MediaQuery.of(context).orientation;
     if (newOrientation != currentOrientation) {
       SchedulerBinding.instance?.addPostFrameCallback(
-            (_) => Future.delayed(const Duration(milliseconds: 600)).then(
-              (__) => setState(
-                () {
+        (_) => Future.delayed(const Duration(milliseconds: 600)).then(
+          (__) => setState(
+            () {
               currentOrientation = newOrientation;
               _calendarKey.currentState?.refreshWidget();
             },
@@ -71,43 +71,43 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> {
                     valueListenable: _dateTime,
                     builder: (context, value, child) => isPortrait
                         ? Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20.0),
-                      child: Text(
-                        DateFormat("MMMM d, EEEE yyyy").format(value),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.0,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
+                            padding: const EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text(
+                              DateFormat("MMMM d, EEEE yyyy").format(value),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
                         : RichText(
-                      text: TextSpan(
-                        text: DateFormat("yyyy\n").format(value),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12.0,
-                          color: Colors.grey,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: DateFormat("EEEE\n").format(value),
-                            style: const TextStyle(
-                              fontSize: 22.0,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.white,
+                            text: TextSpan(
+                              text: DateFormat("yyyy\n").format(value),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12.0,
+                                color: Colors.grey,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: DateFormat("EEEE\n").format(value),
+                                  style: const TextStyle(
+                                    fontSize: 22.0,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: DateFormat("d MMMM").format(value),
+                                  style: const TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          TextSpan(
-                            text: DateFormat("d MMMM").format(value),
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
                 Container(
