@@ -1,5 +1,6 @@
 part of 'calendar.dart';
 
+/// Abstract class: should not be imported!
 class _CalendarMonth extends StatelessWidget {
   static const double weekHeaderHeight = 36.0;
   static const int weekIterator = 7;

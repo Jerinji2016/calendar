@@ -1,5 +1,6 @@
 part of 'calendar.dart';
 
+/// Abstract class: should not be imported!
 class _CalendarPickerWidget extends StatefulWidget {
   final DateTime initialDateTime;
   final DateTime selectedDateTime;

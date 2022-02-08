@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 part 'calendar_month.dart';
 
 part 'calendar_picker_widget.dart';
+part 'datetime_title.dart';
 
 class Calendar {
   static int getNoOfDaysInMonth(int month, int year) {
@@ -69,6 +70,7 @@ class CalendarWidget extends StatelessWidget {
   }
 }
 
+/// Abstract class: should not be imported!
 class _CalendarWrapper extends StatefulWidget {
   final int month;
   final int year;
