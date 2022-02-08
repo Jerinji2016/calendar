@@ -1,4 +1,4 @@
-import 'package:calendar/calendar.dart';
+import 'package:calendar/calendar/calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -213,7 +213,10 @@ class _BaseWidgetState extends State<BaseWidget> {
       );
 
   void _showCalendarDialog(BuildContext context) async {
-    DateTime? date = await Calendar.showDatePickerDialog(context, DateTime.now());
+    DateTime? date = await Calendar.showDatePickerDialog(
+      context,
+      DateTime.now(),
+    );
     debugPrint('_BaseWidgetState._showCalendarDialog: pickedDate: $date');
   }
 }
