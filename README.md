@@ -8,16 +8,23 @@ App that has Calendar Widget
 
 ***
 
-##  Screenshots
+## Screenshots
 
 ### _Portrait_
 
-Mainscreen | Week start drop-down | DatePicker dialog
-:--------------------:|:----------------:|:-----------------------:
-![p_ss_1](screenshots/p_normal.png) | ![p_ss_2](screenshots/p_dropdown.png) | ![p_ss_3](screenshots/p_dialog.png)  
+Main screen | Week start drop-down
+:----------:|:---------------------:
+![p_ss_1](screenshots/p_normal.png) | ![p_ss_2](screenshots/p_dropdown.png)
 
 ### _Landscape_
 
-Mainscreen | Week start drop-down | DatePicker dialog
-:--------------------:|:----------------:|:-----------------------:
-![l_ss_1](screenshots/l_normal.png) | ![l_ss_2](screenshots/l_dropdown.png) | ![l_ss_3](screenshots/l_dialog.png)  
+Mainscreen | Week start drop-down
+:---------:|:--------------------:
+![l_ss_1](screenshots/l_normal.png) | ![l_ss_2](screenshots/l_dropdown.png)
+
+## Dialog
+
+Orientation | Date | Month | Year
+:----------:|:----:|:-----:|:------:
+Portrait Mode | ![p_d_date_ss_3](screenshots/p_dialog_date.png)| ![p_d_month_ss_3](screenshots/p_dialog_month.png) | ![p_d_year_ss_3](screenshots/p_dialog_year.png)
+Landscape Mode | ![l_d_date_ss_3](screenshots/l_dialog_date.png) | ![l_d_month_ss_3](screenshots/l_dialog_month.png) | ![l_d_year_ss_3](screenshots/l_dialog_year.png)
