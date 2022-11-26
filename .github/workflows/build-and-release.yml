@@ -35,8 +35,8 @@ jobs:
 
       - name: Intialising Flutter SDK
         uses: subosito/flutter-action@v1
-          with:
-            flutter-version: '1.7.8+hotfix.4'
+        with:
+          flutter-version: '1.7.8+hotfix.4'
 
       - name: Running Flutter pub get
       - run: flutter pub get
