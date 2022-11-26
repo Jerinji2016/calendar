@@ -21,17 +21,38 @@ jobs:
           distribution: temurin
           java-version: "11"
 
-      - name: Set execution flag for gradlew
-        run: chmod +x gradlew
+#      - name: Set execution flag for gradlew
+#        run: chmod +x gradlew
+#
+#      - name: Build APK
+#        run: bash ./gradlew assembleDebug --stacktrace
+#
+#      - name: Upload APK
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: apk
+#          path: app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Build APK
-        run: bash ./gradlew assembleDebug --stacktrace
+      - name: Intialising Flutter SDK
+        uses: subosito/flutter-action@v1
+          with:
+            flutter-version: '1.7.8+hotfix.4'
+
+      - name: Running Flutter pub get
+      - run: flutter pub get
+
+      - name: Running Flutter tests
+      - run: flutter test
+
+      - name: Building Flutter APK
+      - run: flutter build apk --debug --split-per-abi
 
       - name: Upload APK
-        uses: actions/upload-artifact@v1
+      - name: Create a Release APK
+        uses: ncipollo/release-action@v1
         with:
-          name: apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          artifacts: "build/app/outputs/apk/debug/*.apk"
+          token: ${{ secrets.TOKEN }}
 
   release:
     name: Release APK
