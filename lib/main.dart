@@ -241,9 +241,10 @@ class _DateText extends StatelessWidget {
       text: TextSpan(
         text: DateFormat("yyyy\n").format(dateTime),
         style: const TextStyle(
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
           fontSize: 12.0,
           color: Colors.grey,
+          fontFamily: "Ubuntu",
         ),
         children: [
           TextSpan(
