@@ -13,30 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3
 
       - name: Setup JDK
-        uses: actions/setup-java@v2.5.0
+        uses: actions/setup-java@v3
         with:
-          distribution: temurin
-          java-version: "11"
-
-#      - name: Set execution flag for gradlew
-#        run: chmod +x gradlew
-#
-#      - name: Build APK
-#        run: bash ./gradlew assembleDebug --stacktrace
-#
-#      - name: Upload APK
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: apk
-#          path: app/build/outputs/apk/debug/app-debug.apk
+          distribution: 'zulu'
+          java-version: "17"
 
       - name: Intialising Flutter SDK
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '1.7.8+hotfix.4'
+          flutter-version: '3.0.5'
+          channel: stable
+      - run: flutter --version
 
       - name: Running Flutter pub get
       - run: flutter pub get
