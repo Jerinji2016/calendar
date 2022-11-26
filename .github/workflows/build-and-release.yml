@@ -33,8 +33,8 @@ jobs:
       - name: Running Flutter pub get
         run: flutter pub get
 
-      - name: Running Flutter tests
-        run: flutter test
+#      - name: Running Flutter tests
+#        run: flutter test
 
       - name: Building Flutter APK
         run: flutter build apk --debug --split-per-abi
