@@ -22,7 +22,7 @@ jobs:
           java-version: "11"
 
       - name: Set execution flag for gradlew
-          run: chmod +x gradlew
+        run: chmod +x gradlew
 
       - name: Build APK
         run: bash ./gradlew assembleDebug --stacktrace
