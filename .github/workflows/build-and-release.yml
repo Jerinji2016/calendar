@@ -11,6 +11,8 @@ jobs:
   apk:
     name: Generate APK
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -29,16 +31,15 @@ jobs:
       - run: flutter --version
 
       - name: Running Flutter pub get
-      - run: flutter pub get
+        run: flutter pub get
 
       - name: Running Flutter tests
-      - run: flutter test
+        run: flutter test
 
       - name: Building Flutter APK
-      - run: flutter build apk --debug --split-per-abi
+        run: flutter build apk --debug --split-per-abi
 
       - name: Upload APK
-      - name: Create a Release APK
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/apk/debug/*.apk"
