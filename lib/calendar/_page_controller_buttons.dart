@@ -1,4 +1,4 @@
-part of 'calendar.dart';
+part of calendar;
 
 class _PageControllerButtons extends StatelessWidget {
   final void Function()? onForwardButtonTap;

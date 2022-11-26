@@ -1,3 +1,5 @@
+library calendar;
+
 import 'dart:ui';
 
 import 'package:calendar/extensions.dart';
@@ -6,10 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 
-part 'calendar_month.dart';
-part 'calendar_picker_widget.dart';
-part 'datetime_title.dart';
-part 'page_controller_buttons.dart';
+part '_calendar_month.dart';
+part '_calendar_picker_widget.dart';
+part '_datetime_title.dart';
+part '_page_controller_buttons.dart';
 
 const double _widgetControllerHeight = 45.0;
 const Duration _pageTransitionDuration = Duration(milliseconds: 300);

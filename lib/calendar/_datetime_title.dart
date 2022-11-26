@@ -1,4 +1,4 @@
-part of 'calendar.dart';
+part of calendar;
 
 /// Abstract class: should not be imported!
 class _DateTimeTitle extends StatelessWidget {

@@ -1,4 +1,4 @@
-part of 'calendar.dart';
+part of calendar;
 
 const double cellHeight = 60.0;
 
