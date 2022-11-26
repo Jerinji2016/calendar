@@ -6,9 +6,12 @@ ValueNotifier<int> weekStart = ValueNotifier(DateTime.monday);
 
 void main() {
   runApp(
-    const MaterialApp(
+    MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BaseWidget(),
+      home: const BaseWidget(),
+      theme: ThemeData(
+        fontFamily: "Ubuntu",
+      ),
       themeMode: ThemeMode.dark,
     ),
   );
