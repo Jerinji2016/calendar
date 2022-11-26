@@ -2,18 +2,13 @@ import 'dart:ui';
 
 import 'package:calendar/extensions.dart';
 import 'package:calendar/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 
 part 'calendar_month.dart';
-
 part 'calendar_picker_widget.dart';
-
 part 'datetime_title.dart';
-
 part 'page_controller_buttons.dart';
 
 const double _widgetControllerHeight = 45.0;
@@ -38,7 +33,8 @@ class Calendar {
     }
   }
 
-  static Future<DateTime?> showDatePickerDialog(BuildContext context, DateTime initialDateTime) async => await showDialog<DateTime?>(
+  static Future<DateTime?> showDatePickerDialog(BuildContext context, DateTime initialDateTime) async =>
+      await showDialog<DateTime?>(
         context: context,
         barrierColor: Colors.black45,
         barrierDismissible: true,
@@ -171,7 +167,8 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
                 onPageChanged: _onPageChanged,
                 itemBuilder: (context, index) {
                   DateTime dateDelegate = _getDateTimeFromIndex(index);
-                  DateFormat headerMonthFormat = DateFormat(dateDelegate.year == DateTime.now().year ? "MMMM" : "MMMM y");
+                  DateFormat headerMonthFormat =
+                      DateFormat(dateDelegate.year == DateTime.now().year ? "MMMM" : "MMMM y");
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
