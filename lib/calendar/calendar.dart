@@ -130,7 +130,7 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
     _selectedDateTime = widget.selectedDateTime;
     (widget.selectedDateTime != null) ? dateTime = _selectedDateTime! : DateTime(widget.year, widget.month, 1);
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 50)).then(
         (_) => _onPageChanged(_monthPageController.page!.toInt(), false),
       );

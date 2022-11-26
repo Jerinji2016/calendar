@@ -61,7 +61,7 @@ class _CalendarMonth extends StatelessWidget {
     bool showExtendedDate = (orientation == Orientation.portrait);
 
     if (postBuildCallback != null) {
-      SchedulerBinding.instance?.addPostFrameCallback((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         try {
           RenderBox renderBox = context.findRenderObject() as RenderBox;
           postBuildCallback!.call(renderBox.size);
@@ -113,7 +113,8 @@ class _CalendarMonth extends StatelessWidget {
                       bool isValid = date > 0 && date <= noOfDaysInMonth;
 
                       DateTime thisDay = DateTime(dateTime.year, dateTime.month, date);
-                      bool isSelected = selectedDateTime != null && (thisDay.compareTo(selectedDateTime!.absolute) == 0);
+                      bool isSelected =
+                          selectedDateTime != null && (thisDay.compareTo(selectedDateTime!.absolute) == 0);
                       bool isDisabled = disableDateBefore != null && thisDay.compareTo(disableDateBefore!.absolute) < 0;
                       return Column(
                         mainAxisSize: MainAxisSize.min,

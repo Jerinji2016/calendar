@@ -1,6 +1,6 @@
 part of 'calendar.dart';
 
-final double cellHeight = 60.0;
+const double cellHeight = 60.0;
 
 /// Abstract class: should not be imported!
 class _CalendarPickerWidget extends StatefulWidget {
@@ -67,7 +67,7 @@ class _CalendarPickerWidgetState extends State<_CalendarPickerWidget> with Ticke
   Widget build(BuildContext context) {
     Orientation newOrientation = MediaQuery.of(context).orientation;
     if (newOrientation != currentOrientation) {
-      SchedulerBinding.instance?.addPostFrameCallback(
+      SchedulerBinding.instance.addPostFrameCallback(
         (_) => Future.delayed(const Duration(milliseconds: 600)).then(
           (__) => setState(
             () {
@@ -314,7 +314,20 @@ class _YearPicker extends StatelessWidget {
 }
 
 class _MonthPicker extends StatelessWidget {
-  final List<String> months = const ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  final List<String> months = const [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
 
   final void Function(int month, int year) onMonthPicked;
   final int selectedMonth;
@@ -369,7 +382,7 @@ class _MonthPicker extends StatelessWidget {
                   ),
                   const SizedBox(height: 25.0),
                   GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       mainAxisSpacing: 0.0,
                       crossAxisSpacing: 0.0,
