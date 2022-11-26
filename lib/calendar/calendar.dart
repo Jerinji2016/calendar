@@ -115,11 +115,10 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
   late DateTime dateTime;
   late DateTime? _selectedDateTime;
 
-  //  caches height value on changing page
-  double _newHeight = 300;
+  final Map<int, double> _monthHeightsMap = {};
 
   //  actual height to which the container will adjust.. derived from [_newHeight]
-  double _dynamicCalendarHeight = 301;
+  double _currentCalendarHeight = 301;
 
   void refreshWidget() => (mounted) ? _onPageChanged(_monthPageController.page!.toInt(), false) : null;
 
@@ -158,7 +157,7 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
       child: ValueListenableBuilder<int>(
         valueListenable: weekStart,
         builder: (context, value, child) => SizedBox(
-          height: _dynamicCalendarHeight + (widget.showMonthInHeader ? _widgetControllerHeight : 0.0) + 10,
+          height: _currentCalendarHeight + (widget.showMonthInHeader ? _widgetControllerHeight : 0.0) + 10,
           child: Stack(
             children: [
               //  Actual calendar
@@ -208,9 +207,8 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
                                     }
                                   : null,
                               disableDateBefore: widget.disableDateBefore,
-                              postBuildCallback: (Size widgetSize) {
-                                if (_newHeight != widgetSize.height) _newHeight = widgetSize.height;
-                              },
+                              postBuildCallback: (Size widgetSize) =>
+                                  _monthHeightsMap[index - infinitePageOffset] = widgetSize.height,
                             ),
                           ),
                         ),
@@ -240,8 +238,10 @@ class _CalendarWrapperState extends State<_CalendarWrapper> with TickerProviderS
     if (notify) widget.onMonthChanged?.call(index - infinitePageOffset, date);
 
     //  to optimise rendering
-    if (_dynamicCalendarHeight != _newHeight) {
-      setState(() => _dynamicCalendarHeight = _newHeight);
+    debugPrint("_CalendarWrapperState._onPageChanged: $index");
+    double monthHeight = _monthHeightsMap[index - infinitePageOffset]!;
+    if (_currentCalendarHeight != monthHeight) {
+      setState(() => _currentCalendarHeight = monthHeight);
     }
   }
 

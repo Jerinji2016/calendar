@@ -48,7 +48,9 @@ class _CalendarMonth extends StatelessWidget {
     noOfDaysInMonth = Calendar.getNoOfDaysInMonth(dateTime.month, dateTime.year);
 
     DateTime firstDayOfMonth = dateTime.firstDayOfMonth;
-    _firstDayOffset = _weekIndex.indexWhere((element) => element == firstDayOfMonth.weekday);
+    _firstDayOffset = _weekIndex.indexWhere(
+      (element) => element == firstDayOfMonth.weekday,
+    );
   }
 
   @override
