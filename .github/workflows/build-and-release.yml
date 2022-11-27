@@ -72,7 +72,7 @@ jobs:
           name: split-apk
 
       - name: Upload Release APK (arm64-v8a)
-      - uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
