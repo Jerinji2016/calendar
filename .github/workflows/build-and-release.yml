@@ -35,14 +35,12 @@ jobs:
 
 #      - name: Running Flutter tests
 #        run: flutter test
-      - name: List files
-        run: ls -la && ls android/ -la
 
-      - name: Set execution flag for gradlew
-        run: chmod +x ./gradlew
+#      - name: Set execution flag for gradlew
+#        run: chmod +x android/gradle
 
       - name: Running Gradle Assemble Task
-        run: bash ./gradlew assembleDebug --stacktrace
+        run: bash android/gradlew assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v1
