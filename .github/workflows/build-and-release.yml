@@ -59,7 +59,7 @@ jobs:
       - name: Download APK from build
         uses: actions/download-artifact@v1
         with:
-          name: apk-arm64-v8a
+          name: [ apk-arm64-v8a, apk-armeabi-v7a ]
 
       - name: Create Release
         id: create_release
@@ -70,7 +70,7 @@ jobs:
           tag_name: ${{ github.run_number }}
           release_name: ${{ github.event.repository.name }} v${{ github.run_number }}
 
-      - name: Upload Release APK
+      - name: Upload Release APK (arm64-v8a)
         id: upload_release_asset
         uses: actions/upload-release-asset@v1.0.1
         env:
