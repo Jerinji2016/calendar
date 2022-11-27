@@ -36,6 +36,7 @@ class Calendar {
     }
   }
 
+  /// Shows Date picker dialog
   static Future<DateTime?> showDatePickerDialog(BuildContext context, DateTime initialDateTime) async =>
       await showDialog<DateTime?>(
         context: context,
