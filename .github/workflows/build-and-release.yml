@@ -35,6 +35,14 @@ jobs:
 
 #      - name: Running Flutter tests
 #        run: flutter test
+      - name: List root dir
+        run: ls -la
+
+      - name: List android dir
+        run: ls android/ -la
+
+      - name: List android/gradle dir
+        run: ls android/gradle/ -la
 
 #      - name: Set execution flag for gradlew
 #        run: chmod +x android/gradle
