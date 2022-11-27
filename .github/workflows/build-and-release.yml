@@ -17,35 +17,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-#      - name: Setup JDK
-#        uses: actions/setup-java@v3
-#        with:
-#          distribution: temurin
-#          java-version: 11
+      #      - name: Setup JDK
+      #        uses: actions/setup-java@v3
+      #        with:
+      #          distribution: temurin
+      #          java-version: 11
 
-#      - name: Intialising Flutter SDK
-#        uses: subosito/flutter-action@v2
-#        with:
-#          flutter-version: '3.3.7'
-#          channel: stable
-#
-#      - run: flutter --version
-#      - run: flutter pub get
-#
-#      - name: Build APK
-#        run: flutter build apk --debug --split-per-abi
+      #      - name: Intialising Flutter SDK
+      #        uses: subosito/flutter-action@v2
+      #        with:
+      #          flutter-version: '3.3.7'
+      #          channel: stable
+      #
+      #      - run: flutter --version
+      #      - run: flutter pub get
+      #
+      #      - name: Build APK
+      #        run: flutter build apk --debug --split-per-abi
 
       - name: Processing arm64 APK
         uses: actions/upload-artifact@v1
         with:
           name: apk-arm64-v8a
-#          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
+          #          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
+          path: "release/app-arm64-v8a-debug.apk"
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+      - name: Processing armeabi APK
+        uses: actions/upload-artifact@v1
+        with:
+          name: apk-armeabi-v7a
+          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
           path: "release/app-arm64-v8a-debug.apk"
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
   release:
     name: Release APK
-#    needs: apk-arm64-v8a
+    needs: [ apk-arm64-v8a, apk-armeabi-v7a ]
     runs-on: ubuntu-latest
     steps:
       - name: Download APK from build
