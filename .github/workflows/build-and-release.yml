@@ -43,13 +43,13 @@ jobs:
           path: "release/app-arm64-v8a-debug.apk"
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
-      - name: Processing armeabi APK
-        uses: actions/upload-artifact@v1
-        with:
-          name: split-apk
-          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
-          path: "release/app-arm64-v8a-debug.apk"
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+#      - name: Processing armeabi APK
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: split-apk
+#          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
+#          path: "release/app-arm64-v8a-debug.apk"
+#          token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
   release:
     name: Release APK
