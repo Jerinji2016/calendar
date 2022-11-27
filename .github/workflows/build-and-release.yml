@@ -41,7 +41,6 @@ jobs:
           name: split-apk
           #          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
           path: "release/app-arm64-v8a-debug.apk"
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
 #      - name: Processing armeabi APK
 #        uses: actions/upload-artifact@v1
@@ -49,13 +48,18 @@ jobs:
 #          name: split-apk
 #          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
 #          path: "release/app-arm64-v8a-debug.apk"
-#          token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
   release:
     name: Release APK
     needs: apk
     runs-on: ubuntu-latest
     steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: split-apk
+          path: apk
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -64,13 +68,6 @@ jobs:
         with:
           tag_name: ${{ github.run_number }}
           release_name: ${{ github.event.repository.name }} v${{ github.run_number }}
-
-
-      - name: Download Artifacts
-        uses: actions/download-artifact@v1
-        with:
-          name: split-apk
-          path: apk
 
       - name: Display structure of downloaded files
         run: ls -la
