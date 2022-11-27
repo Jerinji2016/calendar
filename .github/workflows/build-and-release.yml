@@ -72,7 +72,9 @@ jobs:
           name: split-apk
 
       - name: Display structure of downloaded files
-        run: ls -R
+        run: ls -la
+
+      - run: ls split-apk/ -la
 
       - name: Upload Release APK (arm64-v8a)
         uses: actions/upload-release-asset@v1.0.1
@@ -80,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./split-apk/app-arm64-v8a-debug.apk.apk
+          asset_path: ./app-arm64-v8a-debug.apk.apk
           asset_name: ${{ github.event.repository.name }}.apk
           asset_content_type: application/zip
