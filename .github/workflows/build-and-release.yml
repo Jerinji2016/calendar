@@ -35,19 +35,26 @@ jobs:
       #      - name: Build APK
       #        run: flutter build apk --debug --split-per-abi
 
-      - name: Processing arm64 APK
+      - name: Uploading Artifact | arm64 APK
         uses: actions/upload-artifact@v1
         with:
           name: split-apk
           #          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
           path: "release/app-arm64-v8a-debug.apk"
 
-#      - name: Processing armeabi APK
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: split-apk
-#          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
-#          path: "release/app-arm64-v8a-debug.apk"
+      - name: Uploading Artifact | armeabi APK
+        uses: actions/upload-artifact@v1
+        with:
+          name: split-apk
+          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
+          path: "release/app-armeabi-v7a-debug.apk"
+
+      - name: Uploading Artifact | x86_64 APK
+        uses: actions/upload-artifact@v1
+        with:
+          name: split-apk
+          #          path: "build/app/outputs/apk/debug/app-x86_64-debug.apk"
+          path: "release/app-x86_64-debug.apk"
 
   release:
     name: Release APK
@@ -72,15 +79,34 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -la
 
-      - run: pwd
       - run: ls apk/ -la
 
-      - name: Upload Release APK (arm64-v8a)
+      - name: Upload APK (arm64-v8a)
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: apk/app-arm64-v8a-debug.apk
-          asset_name: ${{ github.event.repository.name }}.apk
+          asset_name: ${{ github.event.repository.name }}-arm64.apk
+          asset_content_type: application/zip
+
+      - name: Upload APK (armeabi-v7a)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: apk/app-armeabi-v7a-debug.apk
+          asset_name: ${{ github.event.repository.name }}-armeabi.apk
+          asset_content_type: application/zip
+
+      - name: Upload APK (x86_64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: apk/app-armeabi-v7a-debug.apk
+          asset_name: ${{ github.event.repository.name }}-x86_64.apk
           asset_content_type: application/zip
