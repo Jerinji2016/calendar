@@ -66,11 +66,10 @@ jobs:
           release_name: ${{ github.event.repository.name }} v${{ github.run_number }}
 
 
-      - name: Download Artifact
+      - name: Download Artifacts
         uses: actions/download-artifact@v1
         with:
           name: split-apk
-          path: apks/
 
       - name: Display structure of downloaded files
         run: ls -R
