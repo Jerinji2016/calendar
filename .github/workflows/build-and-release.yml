@@ -35,8 +35,6 @@ jobs:
       - name: Build APK
         run: flutter build apk --debug --split-per-abi
 
-      - name: Upload Split abi APKs
-
       - name: Processing arm64 APK
         uses: actions/upload-artifact@v1
         with:
