@@ -40,7 +40,7 @@ jobs:
 #        run: chmod +x android/gradle
 
       - name: Running Gradle Assemble Task
-        run: bash android/gradlew assembleDebug --stacktrace
+        run: bash android/gradle assembleDebug --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v1
