@@ -17,44 +17,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      #      - name: Setup JDK
-      #        uses: actions/setup-java@v3
-      #        with:
-      #          distribution: temurin
-      #          java-version: 11
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
 
-      #      - name: Intialising Flutter SDK
-      #        uses: subosito/flutter-action@v2
-      #        with:
-      #          flutter-version: '3.3.7'
-      #          channel: stable
-      #
-      #      - run: flutter --version
-      #      - run: flutter pub get
-      #
-      #      - name: Build APK
-      #        run: flutter build apk --debug --split-per-abi
+      - name: Intialising Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.7'
+          channel: stable
+
+      - run: flutter --version
+      - run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --debug --split-per-abi
 
       - name: Uploading Artifact | arm64 APK
         uses: actions/upload-artifact@v1
         with:
           name: split-apk
-          #          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
-          path: "release/app-arm64-v8a-debug.apk"
+          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
 
       - name: Uploading Artifact | armeabi APK
         uses: actions/upload-artifact@v1
         with:
           name: split-apk
-          #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
-          path: "release/app-armeabi-v7a-debug.apk"
+          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
 
       - name: Uploading Artifact | x86_64 APK
         uses: actions/upload-artifact@v1
         with:
           name: split-apk
-          #          path: "build/app/outputs/apk/debug/app-x86_64-debug.apk"
-          path: "release/app-x86_64-debug.apk"
+          path: "build/app/outputs/apk/debug/app-x86_64-debug.apk"
 
   release:
     name: Release APK
@@ -76,13 +73,8 @@ jobs:
           tag_name: ${{ github.run_number }}
           release_name: ${{ github.event.repository.name }} v${{ github.run_number }}
 
-      - name: Display structure of downloaded files
-        run: ls -la
-
-      - run: ls apk/ -la
-
       - name: Upload APK (arm64-v8a)
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
@@ -92,7 +84,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload APK (armeabi-v7a)
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
@@ -102,7 +94,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Upload APK (x86_64)
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
