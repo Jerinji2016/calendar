@@ -69,7 +69,8 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v1
         with:
-          name: apk
+          name: split-apk
+          path: apk
 
       - name: Display structure of downloaded files
         run: ls -la
