@@ -23,35 +23,20 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+      - name: Intialising Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.3.7'
+          channel: stable
 
-#      - name: Intialising Flutter SDK
-#        uses: subosito/flutter-action@v2
-#        with:
-#          flutter-version: '3.3.7'
-#          channel: stable
-#      - run: flutter --version
-#
-#      - name: Running Flutter pub get
-#        run: flutter pub get
+      - run: flutter --version
+      - run: flutter pub get
 
 #      - name: Running Flutter tests
 #        run: flutter test
-      - name: List root dir
-        run: ls -la
 
-      - name: List android dir
-        run: ls android/ -la
-
-      - name: List android/gradle dir
-        run: ls android/gradle/ -la
-
-#      - name: Set execution flag for gradlew
-#        run: chmod +x android/gradle
-
-      - name: Running Gradle Assemble Task
-        run: assembleDebug --stacktrace
+      - name: Build APK
+        run: flutter build apk --debug --split-per-abi
 
       - name: Upload APK
         uses: actions/upload-artifact@v1
