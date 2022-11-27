@@ -17,6 +17,7 @@ const double _widgetControllerHeight = 45.0;
 const Duration _pageTransitionDuration = Duration(milliseconds: 300);
 
 class Calendar {
+  /// Get number of days in provided [month] and [year]
   static int getNoOfDaysInMonth(int month, int year) {
     bool isLeapYear = year % 4 == 0;
     switch (month) {
