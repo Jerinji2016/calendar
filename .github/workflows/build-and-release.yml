@@ -70,7 +70,7 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: split-apk
-          path: apks
+          path: apks/
 
       - name: Display structure of downloaded files
         run: ls -R
