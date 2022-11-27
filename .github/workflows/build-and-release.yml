@@ -69,8 +69,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v1
         with:
-          name: split-apk
-          path: apks
+          name: apk
 
       - name: Display structure of downloaded files
         run: ls -la
@@ -83,6 +82,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /apks/app-arm64-v8a-debug.apk.apk
+          asset_path: apk/app-arm64-v8a-debug.apk.apk
           asset_name: ${{ github.event.repository.name }}.apk
           asset_content_type: application/zip
