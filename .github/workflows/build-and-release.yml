@@ -69,7 +69,7 @@ jobs:
       - name: Upload APK (arm64-v8a)
         uses: actions/download-artifact@v1
         with:
-          name: apk-arm64-v8a
+          name: split-apk
 
 #      - name: Upload Release APK (arm64-v8a)
       - uses: actions/upload-release-asset@v1.0.1
