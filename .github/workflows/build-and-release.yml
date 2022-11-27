@@ -45,13 +45,13 @@ jobs:
 
   release:
     name: Release APK
-    needs: apk
+#    needs: apk-arm64-v8a
     runs-on: ubuntu-latest
     steps:
       - name: Download APK from build
         uses: actions/download-artifact@v1
         with:
-          name: apk
+          name: apk-arm64-v8a
 
       - name: Create Release
         id: create_release
