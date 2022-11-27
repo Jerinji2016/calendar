@@ -37,7 +37,7 @@ jobs:
 #        run: flutter test
 
       - name: Set execution flag for gradlew
-        run: chmod +x gradle
+        run: chmod +x ./gradlew
 
       - name: Running Gradle Assemble Task
         run: bash ./gradlew assembleDebug --stacktrace
