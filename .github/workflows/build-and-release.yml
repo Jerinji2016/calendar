@@ -71,6 +71,9 @@ jobs:
         with:
           name: split-apk
 
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - name: Upload Release APK (arm64-v8a)
         uses: actions/upload-release-asset@v1.0.1
         env:
