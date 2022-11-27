@@ -38,7 +38,7 @@ jobs:
       - name: Processing arm64 APK
         uses: actions/upload-artifact@v1
         with:
-          name: apk-arm64-v8a
+          name: split-apk
           #          path: "build/app/outputs/apk/debug/app-arm64-v8a-debug.apk"
           path: "release/app-arm64-v8a-debug.apk"
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
       - name: Processing armeabi APK
         uses: actions/upload-artifact@v1
         with:
-          name: apk-armeabi-v7a
+          name: split-apk
           #          path: "build/app/outputs/apk/debug/app-armeabi-v7a-debug.apk"
           path: "release/app-arm64-v8a-debug.apk"
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
@@ -77,6 +77,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: apk/apk-arm64-v8a.apk
+          asset_path: split-apk/app-armeabi-v7a-debug.apk
           asset_name: ${{ github.event.repository.name }}.apk
           asset_content_type: application/zip
