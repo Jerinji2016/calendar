@@ -19,7 +19,7 @@ const Duration _pageTransitionDuration = Duration(milliseconds: 300);
 class Calendar {
   /// Get number of days in provided [month] and [year]
   static int getNoOfDaysInMonth(int month, int year) {
-    bool isLeapYear = year % 4 == 0;
+    bool isLeapYear = (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0));
     switch (month) {
       case DateTime.january:
       case DateTime.march:
